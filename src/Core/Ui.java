@@ -75,9 +75,9 @@ public class Ui {
                             break;
                         }
 
-                        System.out.println("Enter start date and time (format: yyyy-MM-ddTHH:mm): ");
+                        System.out.println("Enter start date and time (format: 2025-06-01T10:00): ");
                         LocalDateTime rentFrom = LocalDateTime.parse(scanner.nextLine());
-                        System.out.println("Enter end date and time (format: yyyy-MM-ddTHH:mm): ");
+                        System.out.println("Enter end date and time (format: 2025-07-01T10:00): ");
                         LocalDateTime rentTo = LocalDateTime.parse(scanner.nextLine());
 
                         long days = java.time.Duration.between(rentFrom, rentTo).toDays();
@@ -108,14 +108,130 @@ public class Ui {
                 case 2:
                     System.out.print("Enter brand: ");
                     String brand = scanner.nextLine();
-                    filtered = system.filterByBrand(filtered,brand);
-                    filtered.forEach(System.out::println);
+
+                    List<Car> matchingCars1 = system.getAllCars().stream()
+                            .filter(car -> car.getBrand().equalsIgnoreCase(brand))
+                            .collect(Collectors.toList());
+
+                    if (matchingCars1.isEmpty()) {
+                        System.out.println("No cars found for this brand.");
+                        break;
+                    }
+                    System.out.println("Available " + brand + " cars:");
+                    for (Car car : matchingCars1) {
+                        System.out.println("ID: " + car.getId() +
+                                " | Price per day: " + car.getPrice() + "֏" +
+                                " | Seats: " + car.getSeats());
+                    }
+                    System.out.print("Do you want to rent this car? (yes/no): ");
+                    String rentChoice1 = scanner.nextLine();
+
+                    if (rentChoice1.equalsIgnoreCase("yes")) {
+                        System.out.print("Enter Car ID: ");
+                        String carId = scanner.nextLine();
+
+                        Car selectedCar = system.getAllCars().stream()
+                                .filter(car -> car.getId().equalsIgnoreCase(carId))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (selectedCar == null) {
+                            System.out.println("Invalid Car ID.");
+                            break;
+                        }
+
+                        System.out.println("Enter start date and time (format: 2025-06-01T10:00): ");
+                        LocalDateTime rentFrom = LocalDateTime.parse(scanner.nextLine());
+                        System.out.println("Enter end date and time (format: 2025-07-01T10:00): ");
+                        LocalDateTime rentTo = LocalDateTime.parse(scanner.nextLine());
+
+                        long days = java.time.Duration.between(rentFrom, rentTo).toDays();
+                        if (days <= 0) {
+                            System.out.println("Invalid rental period.");
+                            break;
+                        }
+
+                        int totalPrice = (int) (days * selectedCar.getPrice());
+                        System.out.println("Total rental price: " + totalPrice + "֏");
+
+                        System.out.print("Confirm rental? (yes/no): ");
+                        String confirm = scanner.nextLine();
+
+                        if (confirm.equalsIgnoreCase("yes")) {
+                            if (system.rentCar(carId, rentFrom, rentTo)) {
+                                System.out.println("Car rented successfully!");
+                            } else {
+                                System.out.println("Car is not available for that time.");
+                            }
+                        } else {
+                            System.out.println("Rental cancelled. Returning to main menu...");
+                        }
+                    } else {
+                        System.out.println("Returning to main menu...");
+                    }
                     break;
                 case 3:
                     System.out.print("Minimum seats: ");
                     int seats = scanner.nextInt();
-                    filtered = system.filterBySeats(filtered,seats);
-                    filtered.forEach(System.out::println);
+                    List<Car> matchingCars2 = system.getAllCars().stream()
+                            .filter(car -> car.getSeats() == seats)
+                            .collect(Collectors.toList());
+                    if (matchingCars2.isEmpty()) {
+                        System.out.println("No cars found for this seats number.");
+                        break;
+                    }
+                    System.out.println("Available cars with " + seats + " seats: ");
+                    for (Car car : matchingCars2) {
+                        System.out.println("ID: " + car.getId() + " | Brand: " + car.getBrand() +
+                                " | Price per day: " + car.getPrice() + "֏" +
+                                " | Seats: " + car.getSeats());
+                    }
+                    System.out.print("Do you want to rent this car? (yes/no): ");
+                    String rentChoice2 = scanner.nextLine();
+
+                    if (rentChoice2.equalsIgnoreCase("yes")) {
+                        System.out.print("Enter Car ID: ");
+                        String carId = scanner.nextLine();
+
+                        Car selectedCar = system.getAllCars().stream()
+                                .filter(car -> car.getId().equalsIgnoreCase(carId))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (selectedCar == null) {
+                            System.out.println("Invalid Car ID.");
+                            break;
+                        }
+
+                        System.out.println("Enter start date and time (format: 2025-06-01T10:00): ");
+                        LocalDateTime rentFrom = LocalDateTime.parse(scanner.nextLine());
+                        System.out.println("Enter end date and time (format: 2025-07-01T10:00): ");
+                        LocalDateTime rentTo = LocalDateTime.parse(scanner.nextLine());
+
+                        long days = java.time.Duration.between(rentFrom, rentTo).toDays();
+                        if (days <= 0) {
+                            System.out.println("Invalid rental period.");
+                            break;
+                        }
+
+                        int totalPrice = (int) (days * selectedCar.getPrice());
+                        System.out.println("Total rental price: " + totalPrice + "֏");
+
+                        System.out.print("Confirm rental? (yes/no): ");
+                        String confirm = scanner.nextLine();
+
+                        if (confirm.equalsIgnoreCase("yes")) {
+                            if (system.rentCar(carId, rentFrom, rentTo)) {
+                                System.out.println("Car rented successfully!");
+                            } else {
+                                System.out.println("Car is not available for that time.");
+                            }
+                        } else {
+                            System.out.println("Rental cancelled. Returning to main menu...");
+                        }
+                    } else {
+                        System.out.println("Returning to main menu...");
+                    }
                     break;
                 case 4:
                     System.out.print("Min price: ");
